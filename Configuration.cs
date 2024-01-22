@@ -7,6 +7,8 @@ namespace wangwenx190.ProxyTool
     {
         public string? proxy_url { get; set; }
         public string target_url { get; set; }
+        public string ssl_decrypt_policy { get; set; }
+        public string ssl_error_policy { get; set; }
         public string[] redirect_domains { get; set; }
         public Dictionary<string, string>? url_patches { get; set; }
 

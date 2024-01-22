@@ -85,3 +85,7 @@ Thumbs.db
 .vs/
 .cmake.conf
 .idea/
+[Oo]bj/
+[Oo]bj64/
+[Pp]roperties/
+*.csproj.user

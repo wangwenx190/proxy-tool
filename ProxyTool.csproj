@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
@@ -14,25 +14,36 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <InvariantGlobalization>true</InvariantGlobalization>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+    <!--<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>-->
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>0</WarningLevel>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningLevel>0</WarningLevel>
+    <DebugType>full</DebugType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="app.ico" />
+    <Content Include="app.manifest" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Titanium.Web.Proxy" Version="3.2.0" />
   </ItemGroup>
 
-  <!--<ItemGroup>
-    <Content Update="config.json">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+  <ItemGroup>
+    <None Update="config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-  </ItemGroup>-->
+    </None>
+  </ItemGroup>
 
 </Project>

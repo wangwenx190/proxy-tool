@@ -8,16 +8,30 @@ namespace wangwenx190.ProxyTool
 {
     internal class ProxyService
     {
+        public enum SSL_Decrypt_Policy
+        {
+            Never,
+            Always,
+            OnDemand
+        }
+
+        public enum SSL_Error_Policy
+        {
+            AlwaysIgnore,
+            NeverIgnore
+        }
 
         public static readonly string DEFAULT_PROXY_ADDRESS = "127.0.0.1";
         public static readonly int DEFAULT_PROXY_PORT = 8080;
 
         private readonly ProxyServer _server;
 
-        private Uri proxy_uri;
-        private Uri target_uri;
-        private string[] redirect_domains;
-        private Dictionary<string, string>? url_patches;
+        private readonly Uri _proxy_uri;
+        private readonly Uri _target_uri;
+        private readonly string[] _redirect_domains;
+        private readonly Dictionary<string, string>? _url_patches;
+        private readonly SSL_Decrypt_Policy _ssl_decrypt_policy;
+        private readonly SSL_Error_Policy _ssl_error_policy;
 
         private static string? ExtractIP(string? address)
         {
@@ -116,13 +130,44 @@ namespace wangwenx190.ProxyTool
                 int? port = ExtractPort(proxy_address);
                 if (port == null)
                 {
-                    port = DEFAULT_PROXY_PORT;
+                    proxy_address = FixAddress(proxy_address, DEFAULT_PROXY_PORT);
                 }
-                proxy_address = FixAddress(proxy_address, port);
+                else
+                {
+                    proxy_address = FixAddress(proxy_address, null);
+                }
             }
-            proxy_uri = new(proxy_address);
-            target_uri = new(FixAddress(config.target_url, null));
-            redirect_domains = config.redirect_domains;
+            _proxy_uri = new(proxy_address);
+            _target_uri = new(FixAddress(config.target_url, null));
+            _redirect_domains = config.redirect_domains;
+            if (config.ssl_decrypt_policy.ToLowerInvariant() == "never")
+            {
+                _ssl_decrypt_policy = SSL_Decrypt_Policy.Never;
+            }
+            else if (config.ssl_decrypt_policy.ToLowerInvariant() == "always")
+            {
+                _ssl_decrypt_policy = SSL_Decrypt_Policy.Always;
+            }
+            else if (config.ssl_decrypt_policy.ToLowerInvariant() == "ondemand")
+            {
+                _ssl_decrypt_policy = SSL_Decrypt_Policy.OnDemand;
+            }
+            else
+            {
+                _ssl_decrypt_policy = SSL_Decrypt_Policy.Always;
+            }
+            if (config.ssl_error_policy.ToLowerInvariant() == "alwaysignore")
+            {
+                _ssl_error_policy = SSL_Error_Policy.AlwaysIgnore;
+            }
+            else if (config.ssl_error_policy.ToLowerInvariant() == "neverignore")
+            {
+                _ssl_error_policy = SSL_Error_Policy.NeverIgnore;
+            }
+            else
+            {
+                _ssl_error_policy = SSL_Error_Policy.AlwaysIgnore;
+            }
             
             _server = new();
             _server.CertificateManager.EnsureRootCertificate();
@@ -130,7 +175,7 @@ namespace wangwenx190.ProxyTool
             _server.BeforeRequest += BeforeRequest;
             _server.ServerCertificateValidationCallback += OnCertValidation;
 
-            ExplicitProxyEndPoint endPoint = new(IPAddress.Any, proxy_uri.Port, true);
+            ExplicitProxyEndPoint endPoint = new(IPAddress.Parse(ExtractIP(proxy_address)), _proxy_uri.Port, true);
             endPoint.BeforeTunnelConnectRequest += BeforeTunnelConnectRequest;
 
             _server.AddEndPoint(endPoint);
@@ -149,15 +194,30 @@ namespace wangwenx190.ProxyTool
         private Task BeforeTunnelConnectRequest(object sender, TunnelConnectSessionEventArgs args)
         {
             string hostname = args.HttpClient.Request.RequestUri.Host;
-            args.DecryptSsl = ShouldRedirect(hostname);
+            if (_ssl_decrypt_policy == SSL_Decrypt_Policy.Never)
+            {
+                args.DecryptSsl = false;
+            }
+            else if (_ssl_decrypt_policy == SSL_Decrypt_Policy.Always)
+            {
+                args.DecryptSsl = true;
+            }
+            else
+            {
+                args.DecryptSsl = ShouldRedirect(hostname);
+            }
             return Task.CompletedTask;
         }
 
         private Task OnCertValidation(object sender, CertificateValidationEventArgs args)
         {
-            if (args.SslPolicyErrors == SslPolicyErrors.None)
+            if (_ssl_error_policy == SSL_Error_Policy.AlwaysIgnore)
             {
                 args.IsValid = true;
+            }
+            else
+            {
+                args.IsValid = args.SslPolicyErrors == SslPolicyErrors.None;
             }
             return Task.CompletedTask;
         }
@@ -170,13 +230,13 @@ namespace wangwenx190.ProxyTool
                 string requestUrl = args.HttpClient.Request.Url;
                 string replacedUrl = new UriBuilder(requestUrl)
                 {
-                    Scheme = target_uri.Scheme,
-                    Host = target_uri.Host,
-                    Port = target_uri.Port
+                    Scheme = _target_uri.Scheme,
+                    Host = _target_uri.Host,
+                    Port = _target_uri.Port
                 }.Uri.ToString();
-                if (url_patches != null)
+                if (_url_patches != null)
                 {
-                    foreach (var patch in url_patches)
+                    foreach (var patch in _url_patches)
                     {
                         replacedUrl = replacedUrl.Replace(patch.Key, patch.Value);
                     }
@@ -189,7 +249,7 @@ namespace wangwenx190.ProxyTool
 
         private bool ShouldRedirect(string hostname)
         {
-            foreach (string domain in redirect_domains)
+            foreach (string domain in _redirect_domains)
             {
                 if (string.IsNullOrWhiteSpace(domain))
                 {
