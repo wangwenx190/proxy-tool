@@ -6,6 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
+    <!--<PublishSingleFile>true</PublishSingleFile>-->
+    <!--<PublishReadyToRun>true</PublishReadyToRun>-->
+    <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+    <PublishTrimmed>true</PublishTrimmed>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <InvariantGlobalization>true</InvariantGlobalization>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
   </PropertyGroup>
@@ -21,5 +27,12 @@
   <ItemGroup>
     <PackageReference Include="Titanium.Web.Proxy" Version="3.2.0" />
   </ItemGroup>
+
+  <!--<ItemGroup>
+    <Content Update="config.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>-->
 
 </Project>
