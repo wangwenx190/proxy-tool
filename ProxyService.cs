@@ -21,8 +21,8 @@ namespace wangwenx190.ProxyTool
             NeverIgnore
         }
 
-        public static readonly string DEFAULT_PROXY_ADDRESS = "127.0.0.1";
-        public static readonly int DEFAULT_PROXY_PORT = 8080;
+        public static readonly string DEFAULT_PROXY_ADDRESS = "0.0.0.0";
+        public static readonly UInt16 DEFAULT_PROXY_PORT = 8080;
 
         private readonly ProxyServer _server;
 
@@ -60,7 +60,7 @@ namespace wangwenx190.ProxyTool
             return result;
         }
 
-        private static int? ExtractPort(string? address)
+        private static UInt16? ExtractPort(string? address)
         {
             if (string.IsNullOrWhiteSpace(address))
             {
@@ -85,10 +85,10 @@ namespace wangwenx190.ProxyTool
                 return null;
             }
             portString = portString.Substring(colonIndex + 1);
-            return int.Parse(portString);
+            return UInt16.Parse(portString);
         }
 
-        private static string FixAddress(string address, int? port)
+        private static string FixAddress(string address, UInt16? port)
         {
             string result = address;
             if (!(result.StartsWith("http://") || result.StartsWith("https://")))
@@ -120,23 +120,7 @@ namespace wangwenx190.ProxyTool
 
         public ProxyService(Configuration config)
         {
-            string? proxy_address = config.proxy_url;
-            if (string.IsNullOrWhiteSpace(proxy_address))
-            {
-                proxy_address = FixAddress(DEFAULT_PROXY_ADDRESS, DEFAULT_PROXY_PORT);
-            }
-            else
-            {
-                int? port = ExtractPort(proxy_address);
-                if (port == null)
-                {
-                    proxy_address = FixAddress(proxy_address, DEFAULT_PROXY_PORT);
-                }
-                else
-                {
-                    proxy_address = FixAddress(proxy_address, null);
-                }
-            }
+            string proxy_address = FixAddress(DEFAULT_PROXY_ADDRESS, config.proxy_port == null ? DEFAULT_PROXY_PORT : config.proxy_port);
             _proxy_uri = new(proxy_address);
             _target_uri = new(FixAddress(config.target_url, null));
             _redirect_domains = config.redirect_domains;

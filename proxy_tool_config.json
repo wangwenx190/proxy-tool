@@ -1,10 +1,13 @@
 {
-    "proxy_url": "http://127.0.0.1:8080/",
+    "proxy_port": 8080,
     "target_url": "http://127.0.0.1:8888/",
     "ssl_decrypt_policy": "always",
     "ssl_error_policy": "alwaysignore",
     "redirect_domains": [
         "*.yuanshen.com",
+        "*.genshinimpact.com",
+        "*.bhsr.com",
+        "*.starrails.com",
         "*.mihoyo.com",
         "*.hoyoverse.com"
     ],

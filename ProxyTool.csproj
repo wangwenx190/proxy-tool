@@ -9,12 +9,11 @@
     <!--<PublishSingleFile>true</PublishSingleFile>-->
     <!--<PublishReadyToRun>true</PublishReadyToRun>-->
     <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
-    <PublishTrimmed>true</PublishTrimmed>
-    <SelfContained>true</SelfContained>
+    <!--<PublishTrimmed>true</PublishTrimmed>-->
+    <!--<SelfContained>true</SelfContained>-->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <InvariantGlobalization>true</InvariantGlobalization>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     <!--<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>-->
     <ApplicationIcon>app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -40,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="config.json">
+    <None Update="proxy_tool_config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </None>

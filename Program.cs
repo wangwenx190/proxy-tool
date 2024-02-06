@@ -4,10 +4,10 @@ Console.Title = "wangwenx190's Proxy Tool";
 Console.Clear();
 Console.CursorTop = 0;
 Console.CursorVisible = false;
-Configuration? configuration = Configuration.TryParse();
+Configuration? configuration = Configuration.TryParse("proxy_tool_config.json");
 if (configuration == null)
 {
-    Console.WriteLine("Failed to parse the configuration file.");
+    Console.WriteLine("Failed to parse the JSON configuration file.");
     Console.ReadKey();
     return;
 }
