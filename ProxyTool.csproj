@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PublishAot>true</PublishAot>
+    <!--<PublishAot>true</PublishAot>-->
     <!--<PublishSingleFile>true</PublishSingleFile>-->
     <!--<PublishReadyToRun>true</PublishReadyToRun>-->
     <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
